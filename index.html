@@ -1,0 +1,207 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The dog breed Info</title>
+  <meta name="description" content="The dog breed Info">
+</head>
+<style>
+  img{
+      max-width: 100%;
+      max-height: 100%;
+      display: block; /* remove extra space below image */
+  }
+  li {
+    cursor: pointer;
+  }
+  li:hover{
+    background-color: grey;
+  }
+  div {
+    word-wrap: break-word;
+  }
+  ul{
+    list-style-type: none;
+  }
+
+  .container{
+    background-color: #efe9e9;
+  }
+  h2{
+    background-color: grey;
+  }
+  .container {
+    padding: 20px;
+  }
+
+  .container #show-list-sec, .container #image-sec {
+    border: 1px solid #c9c9c9;
+  }
+  div#search_history {
+    border-top: 1px solid #c9c9c9;
+  }
+
+  div#current-history {
+      border-left: 0.5px solid #c9c9c9;
+  }
+
+  div#session-history {
+      border-right: .5px solid #c9c9c9;
+  }
+  form{
+    display: inline;
+  }
+</style>
+<body>
+  <div class= 'container border'>
+    <h2 align='center'>Dog Breed Information</h2>
+    <div id='main-sec' class='col-sm-12 row'>
+      <div id='show-list-sec' class='col-sm-2'>
+        <ul class='list-group'></ul>
+        <button id='show-list-button' align='center'>Next List</button>
+      </div>
+      <div id='show-details' class='col-sm-10'>
+        <div id='info-sec' class='col-sm-5'>
+          <div class='col-sm-12'><div id='name-meta' class='col-sm-4'>Name</div>
+          <div id='name-value' class='col-sm-8'></div></div>
+          <div class='col-sm-12'><div id='height-meta' class='col-sm-4'>Height(Inches)</div>
+          <div id='height-value' class='col-sm-8'></div></div>
+          <div class='col-sm-12'><div id='weight-meta' class='col-sm-4'>Weight(Kg)</div>
+          <div id='weight-value' class='col-sm-8'></div></div>
+          <div class='col-sm-12'><div id='life_span-meta' class='col-sm-4'>Life Span</div>
+          <div id='life_span-value' class='col-sm-8'></div></div>
+          <div class='col-sm-12'><div id='temperament-meta' class='col-sm-4'>Temperament</div>
+          <div id='temperament-value' class='col-sm-8'></div></div>
+          <div class='col-sm-12'><div id='bred_for-meta' class='col-sm-4'>Bred For</div>
+          <div id='bred_for-value' class='col-sm-8'></div></div>
+        </div>
+        <div id='image-sec' class='col-sm-7'>
+          <p>click on one of the breeds on the left</p>
+        </div>
+      </div>
+    </div> 
+    <div id="search_history" class="col-sm-12 row">
+      <h4 align='center'>Search History</h4>
+      <div id="session-history" class="col-sm-6">
+        <p>Current Search History</p>
+        <form>
+          Seach History: <input id='seach-session' type="text" name="country_code" pattern="[a-zA-Z0-9\s]+" title="Enter a dog breed" required='true'>
+          <input type="submit" value='Search'>
+        </form>
+        <button id='refresh-session'>Show All</button>
+        <ul></ul>
+      </div>
+      <div id="current-history" class="col-sm-6">
+        <p>All Search History</p>
+        <form>
+          Seach History: <input id='seach-current' type="text" name="country_code" pattern="[a-zA-Z0-9\s]+" title="Enter a dog breed" autofocus required='true'>
+          <input type="submit" value='Search'>
+        </form>
+        <button id='refresh-current'>Show All</button>
+        <ul></ul>
+      </div>
+    </div>
+  </div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+  <!-- <script type=module src="./dog_breeds.js"></script> -->
+  <script type=module>
+  import {fetch_random_dog_breed_names} from './dog_breeds.js'
+  import {fetch_breed_details} from './dog_breeds.js'
+  import {sessionHelper} from './session_helper.js'
+
+  // async function add_list(dog_breed_list){
+  //   return dog_breed_list.map((dog) =>{
+  //     return $(`<li id="${dog.id}" href='#' class='list-group'>${dog.name}</li>`);
+  //   });
+  // }
+  // function add_to_local_storage(name){
+  //   let items = get_local_storage_list()
+  //   items.push(name)
+  //   localStorage.setItem('breed_names', JSON.stringify(items));
+  // }
+
+  // function add_to_session_storage(name){
+  //   let items = get_session_storage_list()
+  //   items.push(name)
+  //   sessionStorage.setItem('breed_names', JSON.stringify(items));
+  // }
+  // function get_session_storage_list(){
+  //   return JSON.parse(sessionStorage.getItem('breed_names')) || [];
+  // }
+  // function get_local_storage_list(){
+    //   return JSON.parse(localStorage.getItem('breed_names')) || [];
+    // }
+
+  function show_session_storage_list(){
+    $('#session-history ul li').remove();
+    const li_list = sessionHelper.get_session_storage_list().map((name) => {
+      return $(`<li>${name}</li>`)
+    });
+    $('#session-history ul').append(li_list);
+  }
+  function show_local_storage_list(){
+    $('#current-history ul li').remove();
+    const li_list = sessionHelper.get_local_storage_list().map((name) => {
+      return $(`<li>${name}</li>`)
+    });
+    $('#current-history ul').append(li_list);
+  }
+  async function add_click_on_list(list_items){
+    $(list_items).each((_,item) =>{
+      $(item).on('click',async ()=>{
+        let dog_details = await fetch_breed_details($(item).attr('id'));
+        let img = $('<img id="dynamic">');
+        img.attr('src', dog_details.imageurl);
+        $('#image-sec').html(img);
+        $('#name-value').text(dog_details.details[0].name);
+        sessionHelper.add_to_local_storage(dog_details.details[0].name);
+        sessionHelper.add_to_session_storage(dog_details.details[0].name);
+        $('#height-value').text(dog_details.details[0].height.metric);
+        $('#weight-value').text(dog_details.details[0].weight.metric);
+        $('#life_span-value').text(dog_details.details[0].life_span);
+        $('#temperament-value').text(dog_details.details[0].temperament);
+        $('#bred_for-value').text(dog_details.details[0].bred_for);
+      });
+    });
+  }
+  $(document).ready(function(){
+    $('#show-list-button').on('click',async () => {
+      const ul = $('#show-list-sec').find('ul')
+      ul.find('li').remove();
+      let dog_breed_list = await fetch_random_dog_breed_names();
+      let list_items = sessionHelper.add_list(dog_breed_list);
+      ul.append(list_items);
+      add_click_on_list(list_items);
+    }).click();
+    $('#session-history form').on('submit',(e) => {
+      e.preventDefault();
+      show_session_storage_list();
+      const input_text = $('#seach-session').val();
+      $('#session-history ul li').removeClass('hide');
+      $('#session-history ul li').each(function(_,li){
+        li = $(li);
+        if(!(li.text().match(input_text)))
+          li.addClass('hide');
+      })
+    });
+    $('#current-history form').on('submit',(e) => {
+      e.preventDefault();
+      show_local_storage_list();
+      const input_text = $('#seach-current').val();
+      $('#current-history ul li').removeClass('hide');
+      $('#current-history ul li').each(function(_,li){
+        li = $(li);
+        if(!(li.text().match(input_text)))
+          li.addClass('hide');
+      })
+    });
+    $('#refresh-current').on('click',show_local_storage_list);
+    $('#refresh-session').on('click',show_session_storage_list);
+  });
+</script>
+</body>
+</html>
